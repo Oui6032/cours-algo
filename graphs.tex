@@ -650,6 +650,8 @@ In a \textbf{weighted graph}, each edge $(u, v)$ has a weight $w(u, v)$. The \te
 
 Dijkstra finds the shortest paths from a source to all vertices, assuming \textbf{all edge weights are non-negative}.
 
+\subsubsection{Algorithm}
+
 \begin{lstlisting}
 import heapq
 
@@ -673,31 +675,182 @@ def dijkstra(graph, source):
 
 \textbf{Limitation:} Dijkstra \textbf{fails with negative edge weights}. A negative edge could create a shorter path to an already-finalized vertex.
 
-\subsection{Example}
+\subsubsection{Example}
 
 \begin{center}
-\begin{tikzpicture}[
-    node distance=2cm,
-    every node/.style={circle, draw, minimum size=0.8cm},
-    edge/.style={-{Latex}, thick}
-]
-\node (0) {0};
-\node (1) [right=of 0] {1};
-\node (2) [below=of 0] {2};
-\node (3) [below=of 1] {3};
+\begin{tikzpicture}
+\node (0) at (0,0) {0};
+\node (1) at (2,0) {1};
+\node (2) at (0,-2) {2};
+\node (3) at (2,-2) {3};
 
-\draw[edge] (0) -- node[above] {2} (1);
-\draw[edge] (0) -- node[left] {4} (2);
-\draw[edge] (1) -- node[right] {3} (3);
-\draw[edge] (2) -- node[below] {1} (3);
+\draw[-{Latex}, thick] (0) -- node[above] {2} (1);
+\draw[-{Latex}, thick] (0) -- node[left] {4} (2);
+\draw[-{Latex}, thick] (1) -- node[right] {3} (3);
+\draw[-{Latex}, thick] (2) -- node[below] {1} (3);
 \end{tikzpicture}
 \end{center}
 
 Dijkstra from 0: $\{0: 0, 1: 2, 2: 4, 3: 5\}$ (path $0 \to 2 \to 3$ has weight $4 + 1 = 5$, same as $0 \to 1 \to 3$ with $2 + 3 = 5$).
 
+\subsection{Dijkstra's Algorithm Without a Heap}
+
+The heap version is optimal for sparse graphs, but for \textbf{dense graphs} ($E \approx V^2$), a simpler version using an array is actually faster.
+
+\subsubsection{Idea}
+
+Instead of a priority queue, maintain:
+\begin{itemize}
+    \item \code{dist[v]}: the current best-known distance from the source to \code{v}.
+    \item \code{visited[v]}: whether \code{v} has been finalized (its distance is final).
+\end{itemize}
+
+At each step:
+\begin{enumerate}
+    \item Find the \textbf{unvisited vertex with the smallest \code{dist}} (linear scan over all vertices).
+    \item Mark it as visited.
+    \item \textbf{Relax} its outgoing edges: for each neighbor \code{v} with weight \code{w}, if \code{dist[u] + w < dist[v]}, update \code{dist[v]}.
+\end{enumerate}
+
+Repeat until all vertices are visited (or the smallest distance is infinity, meaning the remaining vertices are unreachable).
+
+\subsubsection{Algorithm}
+
+\begin{lstlisting}
+def dijkstra_array(graph, source):
+    n = len(graph)
+    dist = [float('inf')] * n
+    visited = [False] * n
+    dist[source] = 0
+
+    for _ in range(n):
+        # Step 1: find the unvisited vertex with the smallest distance
+        u = -1
+        best = float('inf')
+        for v in range(n):
+            if not visited[v] and dist[v] < best:
+                best = dist[v]
+                u = v
+
+        # If no reachable vertex remains, stop
+        if u == -1:
+            break
+
+        # Step 2: mark u as visited
+        visited[u] = True
+
+        # Step 3: relax the outgoing edges of u
+        for v, w in graph[u]:
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+
+    return dist
+\end{lstlisting}
+
+\textbf{Input:} an adjacency list where \code{graph[u]} is a list of \code{(v, w)} pairs. Vertices are numbered \code{0} to \code{n-1}.
+
+\textbf{Output:} a list \code{dist} where \code{dist[v]} is the shortest distance from \code{source} to \code{v} (or \code{inf} if unreachable).
+
+\subsubsection{Example}
+
+Same graph as above:
+
+\begin{center}
+\begin{tikzpicture}
+\node (0) at (0,0) {0};
+\node (1) at (2,0) {1};
+\node (2) at (0,-2) {2};
+\node (3) at (2,-2) {3};
+
+\draw[-{Latex}, thick] (0) -- node[above] {2} (1);
+\draw[-{Latex}, thick] (0) -- node[left] {4} (2);
+\draw[-{Latex}, thick] (1) -- node[right] {3} (3);
+\draw[-{Latex}, thick] (2) -- node[below] {1} (3);
+\end{tikzpicture}
+\end{center}
+
+Trace from source 0:
+
+\textbf{Initial:}
+\[
+\text{dist} = [0, \infty, \infty, \infty], \quad \text{visited} = [F, F, F, F]
+\]
+
+\textbf{Step 1:} smallest unvisited is 0 (dist = 0). Mark visited.
+Relax edges of 0:
+\begin{itemize}
+    \item $0 \to 1$ (weight 2): \code{dist[1] = 0 + 2 = 2}.
+    \item $0 \to 2$ (weight 4): \code{dist[2] = 0 + 4 = 4}.
+\end{itemize}
+\[
+\text{dist} = [0, 2, 4, \infty], \quad \text{visited} = [T, F, F, F]
+\]
+
+\textbf{Step 2:} smallest unvisited is 1 (dist = 2). Mark visited.
+Relax edges of 1:
+\begin{itemize}
+    \item $1 \to 3$ (weight 3): \code{dist[3] = 2 + 3 = 5}.
+\end{itemize}
+\[
+\text{dist} = [0, 2, 4, 5], \quad \text{visited} = [T, T, F, F]
+\]
+
+\textbf{Step 3:} smallest unvisited is 2 (dist = 4). Mark visited.
+Relax edges of 2:
+\begin{itemize}
+    \item $2 \to 3$ (weight 1): $4 + 1 = 5$, not better than 5. No update.
+\end{itemize}
+\[
+\text{dist} = [0, 2, 4, 5], \quad \text{visited} = [T, T, T, F]
+\]
+
+\textbf{Step 4:} smallest unvisited is 3 (dist = 5). Mark visited.
+No outgoing edges.
+\[
+\text{dist} = [0, 2, 4, 5], \quad \text{visited} = [T, T, T, T]
+\]
+
+\textbf{Result:} $[0, 2, 4, 5]$. The shortest distances from 0 are: to 0 = 0, to 1 = 2, to 2 = 4, to 3 = 5.
+
+\subsubsection{Complexity}
+
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+Resource & Array version & Heap version \\
+\midrule
+Time & $O(V^2)$ & $O((V + E) \log V)$ \\
+Space & $O(V)$ & $O(V + E)$ \\
+Best for & Dense graphs & Sparse graphs \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Why $O(V^2)$:} the outer loop runs $V$ times, and each iteration does a linear scan of $V$ vertices to find the minimum. The total relaxation cost is $O(E)$, which is dominated by $O(V^2)$ for dense graphs.
+
+\subsubsection{Correctness}
+
+\textbf{Invariant:} when a vertex $u$ is marked as visited, \code{dist[u]} is the true shortest distance from the source.
+
+\textbf{Proof (by induction on the number of visited vertices):}
+
+\begin{itemize}
+    \item \textbf{Base case:} the source is visited first, with \code{dist[source] = 0}. Correct.
+    \item \textbf{Inductive step:} suppose all previously visited vertices have correct distances. Let $u$ be the unvisited vertex with the smallest \code{dist[u]}. We claim \code{dist[u]} is the true shortest distance.
+    \begin{itemize}
+        \item Suppose there is a shorter path from the source to $u$. This path must go through some unvisited vertex $x$ (since all visited vertices have correct distances, and any path through them would already be reflected in \code{dist[u]}).
+        \item But $x$ is unvisited, and \code{dist[x]} $\geq$ \code{dist[u]} (since $u$ is the minimum). So the path through $x$ has length at least \code{dist[u]}, contradiction.
+        \item Therefore, \code{dist[u]} is correct.
+    \end{itemize}
+\end{itemize}
+
+Since all edge weights are non-negative, the greedy choice is safe. $\qed$
+
 \subsection{Floyd-Warshall Algorithm}
 
 Floyd-Warshall computes the shortest paths between \textbf{all pairs} of vertices, using dynamic programming.
+
+\subsubsection{Algorithm}
 
 \begin{lstlisting}
 def floyd_warshall(adj_matrix):
@@ -711,9 +864,27 @@ def floyd_warshall(adj_matrix):
     return dist
 \end{lstlisting}
 
-\textbf{Complexity:} $O(V^3)$ time, $O(V^2)$ space.
+\textbf{Input:} an adjacency matrix where \code{adj_matrix[i][j]} is the weight of edge $i \to j$, or \code{float('inf')} if absent, and 0 for $i = j$.
 
-\textbf{Properties:}
+\textbf{Output:} a matrix \code{dist} where \code{dist[i][j]} is the shortest distance from $i$ to $j$.
+
+\subsubsection{Complexity}
+
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+Resource & Complexity \\
+\midrule
+Time & $O(V^3)$ \\
+Space & $O(V^2)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Why $O(V^3)$:} three nested loops, each running $V$ times. The inner loop body is $O(1)$.
+
+\subsubsection{Properties}
+
 \begin{itemize}
     \item Handles \textbf{negative edge weights} (but not negative cycles).
     \item Simple to implement (three nested loops).
@@ -721,6 +892,71 @@ def floyd_warshall(adj_matrix):
 \end{itemize}
 
 \textbf{Negative cycle detection:} after the algorithm, if $\text{dist}[i][i] < 0$ for some $i$, there is a negative cycle through $i$.
+
+\subsubsection{Example}
+
+Graph with 4 vertices:
+
+\begin{center}
+\begin{tikzpicture}
+\node (0) at (0,0) {0};
+\node (1) at (2,0) {1};
+\node (2) at (0,-2) {2};
+\node (3) at (2,-2) {3};
+
+\draw[-{Latex}, thick] (0) -- node[above] {2} (1);
+\draw[-{Latex}, thick] (0) -- node[left] {4} (2);
+\draw[-{Latex}, thick] (1) -- node[right] {3} (3);
+\draw[-{Latex}, thick] (2) -- node[below] {1} (3);
+\end{tikzpicture}
+\end{center}
+
+Adjacency matrix:
+\[
+\text{adj} =
+\begin{pmatrix}
+0 & 2 & 4 & \infty \\
+\infty & 0 & \infty & 3 \\
+\infty & \infty & 0 & 1 \\
+\infty & \infty & \infty & 0
+\end{pmatrix}
+\]
+
+After Floyd-Warshall:
+\[
+\text{dist} =
+\begin{pmatrix}
+0 & 2 & 4 & 5 \\
+\infty & 0 & \infty & 3 \\
+\infty & \infty & 0 & 1 \\
+\infty & \infty & \infty & 0
+\end{pmatrix}
+\]
+
+The shortest distances from 0 are: to 0 = 0, to 1 = 2, to 2 = 4, to 3 = 5 (via $0 \to 2 \to 3$).
+
+\subsection{Comparison}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Algorithm & Problem & Negative weights? & Time & Space \\
+\midrule
+Dijkstra (heap) & Single-source & No & $O((V + E) \log V)$ & $O(V + E)$ \\
+Dijkstra (array) & Single-source & No & $O(V^2)$ & $O(V)$ \\
+Floyd-Warshall & All-pairs & Yes (no neg.\ cycles) & $O(V^3)$ & $O(V^2)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{When to use which:}
+\begin{itemize}
+    \item \textbf{Dijkstra (heap)}: single-source shortest paths, sparse graphs, non-negative weights.
+    \item \textbf{Dijkstra (array)}: single-source shortest paths, dense graphs, non-negative weights.
+    \item \textbf{Floyd-Warshall}: all-pairs shortest paths, dense graphs, negative weights allowed.
+\end{itemize}
 
 % ============================================================
 % 8. COMPARISON
