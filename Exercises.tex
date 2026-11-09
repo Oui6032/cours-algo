@@ -1,0 +1,499 @@
+\documentclass[11pt,a4paper]{article}
+
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes, calc}
+\usepackage{enumitem}
+
+% ============================================================
+% CONFIGURATION
+% ============================================================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{red!70!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    frame=single,
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4,
+    literate={≤}{{$\leq$}}1 {≥}{{$\geq$}}1 {≠}{{$\neq$}}1
+}
+
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand{\bigOmega}{\Omega}
+\newcommand{\bigTheta}{\Theta}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+
+% Difficulty stars
+\newcommand{\easy}{$\star$}
+\newcommand{\medium}{$\star\star$}
+\newcommand{\hard}{$\star\star\star$}
+
+% ============================================================
+% TITLE
+% ============================================================
+\title{\textbf{Algorithms: Complexity and Optimization}\\
+\large Exercise Book}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+% ============================================================
+% INTRODUCTION
+% ============================================================
+\section*{Introduction}
+
+This exercise book accompanies the course \emph{Algorithms: Complexity and Optimization}. Each section follows the structure of the course and contains two types of exercises:
+\begin{itemize}
+    \item \textbf{Theoretical exercises} (tracing, proving, drawing) --- to be solved on paper first.
+    \item \textbf{Programming exercises} (coding, testing) --- to be implemented in Python.
+\end{itemize}
+
+Each exercise is graded by difficulty:
+\begin{itemize}
+    \item \easy\ --- warm-up, direct application of the course.
+    \item \medium\ --- requires some reasoning.
+    \item \hard\ --- challenging, requires proof or deep understanding.
+\end{itemize}
+
+\newpage
+
+% ============================================================
+% 1. ASYMPTOTIC NOTATION
+% ============================================================
+\section{Asymptotic Notation}
+
+\subsection{Theoretical Exercises}
+
+\begin{enumerate}[label=\textbf{1.\arabic*}]
+
+    \item[\easy] Simplify $O(4n^3 + 2n^2 + 100)$. Justify your answer.
+
+    \item[\easy] True or false: $2^n = O(n^2)$? Justify.
+
+    \item[\easy] Find the tightest $\Theta$ for $5n \log n + 3n + 2$.
+
+    \item[\medium] Prove that $n^2 + 3n = \Omega(n^2)$.
+
+    \item[\medium] Order the following functions by growth rate:
+    \[
+    \sqrt{n}, \quad n, \quad n \log n, \quad \log n, \quad n^2, \quad 2^n.
+    \]
+
+    \item[\medium] Prove that $n \log n = O(n^2)$ but $n^2 \neq O(n \log n)$.
+
+    \item[\medium] Give an example of an algorithm with $O(1)$ time complexity but $O(n)$ space complexity. Justify.
+
+    \item[\medium] Prove that $3n^2 + 5n + 7 = O(n^2)$ by giving explicit constants $c$ and $n_0$.
+
+\end{enumerate}
+
+% ============================================================
+% 2. DATA STRUCTURES
+% ============================================================
+\section{Data Structures}
+
+\subsection{Theoretical Exercises}
+
+\begin{enumerate}[label=\textbf{2.\arabic*}]
+
+    \item[\easy] What is the complexity of accessing the last element of an array? The first element of a linked list? Justify.
+
+    \item[\easy] What is the complexity of inserting an element at the beginning of an array? At the end? In the middle? Justify.
+
+    \item[\medium] Implement a queue using two stacks. What is the complexity of each operation (enqueue, dequeue)?
+
+    \item[\medium] Implement a stack using two queues. What is the complexity of each operation (push, pop)?
+
+    \item[\easy] Draw the binary search tree (BST) obtained by inserting the following keys in this order:
+    \[
+    50, 30, 70, 20, 40, 60, 80.
+    \]
+    What is the height of the tree?
+
+    \item[\easy] What is the height of a BST with $n$ nodes in the best case? In the worst case? Justify.
+
+    \item[\medium] Represent a graph with 5 vertices and 6 edges as an adjacency matrix and as an adjacency list. Compare the space used by the two representations.
+
+    \item[\hard] Prove that the height of a balanced BST with $n$ nodes is $O(\log n)$.
+
+    \item[\medium] Why does a degenerate BST have $O(n)$ search complexity? Give an insertion order that produces a degenerate BST.
+
+    \item[\medium] Compare the space complexity of an adjacency matrix and an adjacency list for a sparse graph. Which is better, and why?
+
+\end{enumerate}
+
+\subsection{Programming Exercises}
+
+\begin{enumerate}[label=\textbf{2.\arabic*}, start=11]
+
+    \item[\easy] Write a function \code{find_max(arr)} that returns the maximum element of an array. Test it on \code{[3, 1, 4, 1, 5, 9, 2, 6]}.
+    \begin{lstlisting}
+def find_max(arr):
+    # your code here
+    pass
+
+# Test
+print(find_max([3, 1, 4, 1, 5, 9, 2, 6]))  # Expected: 9
+    \end{lstlisting}
+
+    \item[\easy] Write a function \code{reverse_array(arr)} that reverses an array \emph{in place}, in $O(n)$ time and $O(1)$ space. Test it on \code{[1, 2, 3, 4, 5]}.
+    \begin{lstlisting}
+def reverse_array(arr):
+    # your code here
+    pass
+
+# Test
+arr = [1, 2, 3, 4, 5]
+reverse_array(arr)
+print(arr)  # Expected: [5, 4, 3, 2, 1]
+    \end{lstlisting}
+
+    \item[\easy] Write a function \code{is_sorted(arr)} that returns \code{True} if the array is sorted in ascending order, \code{False} otherwise. Test it on \code{[1, 2, 3]} and \code{[1, 3, 2]}.
+    \begin{lstlisting}
+def is_sorted(arr):
+    # your code here
+    pass
+
+# Test
+print(is_sorted([1, 2, 3]))  # Expected: True
+print(is_sorted([1, 3, 2]))  # Expected: False
+    \end{lstlisting}
+
+    \item[\medium] Implement a linked list with the following operations: \code{insert_at_head}, \code{insert_at_tail}, \code{delete}, \code{search}, \code{print_list}. Test it on a sequence of 10 operations.
+    \begin{lstlisting}
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.next = None
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def insert_at_head(self, value):
+        # your code here
+        pass
+
+    def insert_at_tail(self, value):
+        # your code here
+        pass
+
+    def delete(self, value):
+        # your code here
+        pass
+
+    def search(self, value):
+        # your code here
+        pass
+
+    def print_list(self):
+        # your code here
+        pass
+    \end{lstlisting}
+
+    \item[\medium] Implement a stack using a Python list. Provide \code{push}, \code{pop}, \code{peek}, and \code{is_empty}. Test it.
+    \begin{lstlisting}
+class Stack:
+    def __init__(self):
+        self.items = []
+
+    def push(self, x):
+        # your code here
+        pass
+
+    def pop(self):
+        # your code here
+        pass
+
+    def peek(self):
+        # your code here
+        pass
+
+    def is_empty(self):
+        # your code here
+        pass
+    \end{lstlisting}
+
+    \item[\medium] Implement a queue using \code{collections.deque}. Provide \code{enqueue}, \code{dequeue}, \code{peek}, and \code{is_empty}. Test it.
+    \begin{lstlisting}
+from collections import deque
+
+class Queue:
+    def __init__(self):
+        self.items = deque()
+
+    def enqueue(self, x):
+        # your code here
+        pass
+
+    def dequeue(self):
+        # your code here
+        pass
+
+    def peek(self):
+        # your code here
+        pass
+
+    def is_empty(self):
+        # your code here
+        pass
+    \end{lstlisting}
+
+    \item[\medium] Implement a queue using two stacks. What is the amortized complexity of \code{dequeue}? Test it on 10 enqueues and 5 dequeues.
+    \begin{lstlisting}
+class QueueTwoStacks:
+    def __init__(self):
+        self.inbox = []
+        self.outbox = []
+
+    def enqueue(self, x):
+        # your code here
+        pass
+
+    def dequeue(self):
+        # your code here
+        pass
+    \end{lstlisting}
+
+    \item[\hard] Write a function \code{is_balanced(s)} that checks whether a string of parentheses is balanced. Test it on \code{"(())()"}, \code{"(()"}, and \code{")("}.
+    \begin{lstlisting}
+def is_balanced(s):
+    # your code here
+    pass
+
+# Test
+print(is_balanced("(())()"))  # Expected: True
+print(is_balanced("(()"))     # Expected: False
+print(is_balanced(")("))      # Expected: False
+    \end{lstlisting}
+
+\end{enumerate}
+
+% ============================================================
+% 3. SEARCH IN BST AND SORTED LIST
+% ============================================================
+\section{Search in BST and Sorted List}
+
+\subsection{Theoretical Exercises}
+
+\begin{enumerate}[label=\textbf{3.\arabic*}]
+
+    \item[\easy] Trace the iterative dichotomy search on the array
+    \[
+    [1, 3, 5, 7, 9, 11, 13]
+    \]
+    for the value $7$. How many comparisons are performed?
+
+    \item[\easy] What is the complexity of searching in a degenerate BST? In a balanced BST? Justify.
+
+    \item[\medium] Write the iterative and recursive versions of dichotomy. Compare their space complexity.
+
+    \item[\medium] Why is the recursive version of dichotomy a tail call? What does this imply in a language that supports tail-call optimization?
+
+    \item[\hard] Prove that any comparison-based search in a sorted array of $n$ elements requires $\Omega(\log n)$ comparisons in the worst case.
+
+    \item[\medium] Write a function that finds the \textbf{first} element $\geq x$ in a sorted array, in $O(\log n)$ time.
+
+    \item[\medium] Write a function that finds the \textbf{number of occurrences} of $x$ in a sorted array, in $O(\log n)$ time.
+
+    \item[\hard] Write a function that finds the \textbf{$k$-th smallest} element in a BST.
+
+\end{enumerate}
+
+% ============================================================
+% 4. SORTING ALGORITHMS
+% ============================================================
+\section{Sorting Algorithms}
+
+\subsection{Theoretical Exercises}
+
+\begin{enumerate}[label=\textbf{4.\arabic*}]
+
+    \item[\easy] Trace bubble sort on the array
+    \[
+    [5, 2, 4, 6, 1, 3].
+    \]
+    Count the number of swaps.
+
+    \item[\easy] Trace merge sort on the array
+    \[
+    [38, 27, 43, 3, 9, 82, 10].
+    \]
+    Draw the recursion tree and the merging steps.
+
+    \item[\easy] Trace quick sort (with the last element as pivot) on the array
+    \[
+    [10, 7, 8, 9, 1, 5].
+    \]
+    Show the partition at each step.
+
+    \item[\medium] Why does quick sort have an $O(n^2)$ worst case? Give an example of input that triggers it, and explain how to avoid it with a randomized pivot.
+
+    \item[\medium] Prove that merge sort is $O(n \log n)$ in all cases. Write the recurrence and solve it.
+
+    \item[\hard] Prove that any comparison-based sorting algorithm requires $\Omega(n \log n)$ comparisons in the worst case.
+
+\end{enumerate}
+
+\subsection{Programming Exercises}
+
+\begin{enumerate}[label=\textbf{4.\arabic*}, start=7]
+
+    \item[\easy] Implement insertion sort in Python and test it on 5 examples (empty array, one element, sorted array, reverse-sorted array, random array).
+
+    \item[\medium] Implement merge sort in Python and test it on \code{[38, 27, 43, 3, 9, 82, 10]}.
+
+    \item[\medium] Implement quick sort with a randomized pivot. Test it on a sorted array, a reverse-sorted array, and a random array.
+
+    \item[\medium] Compare experimentally bubble sort, quick sort, and merge sort on arrays of size $n = 1000$, $n = 10{,}000$, and $n = 100{,}000$. Report the execution times and discuss the results.
+
+\end{enumerate}
+
+% ============================================================
+% 5. GREEDY ALGORITHMS
+% ============================================================
+\section{Greedy Algorithms}
+
+\subsection{Theoretical Exercises}
+
+\begin{enumerate}[label=\textbf{5.\arabic*}]
+
+    \item[\easy] Apply the greedy coin change algorithm to $S = 87$ with the European system $\{1, 2, 5, 10, 20, 50\}$. Give the dictionary of coins used and the total number of coins.
+
+    \item[\easy] Show that the greedy algorithm fails for the coin system $\{1, 3, 4\}$ with $S = 6$. What is the optimal change? How many coins does the greedy algorithm use?
+
+    \item[\medium] Generate all possible changes for $S = 5$ with coins $\{1, 2, 3\}$, without considering the order. How many are there?
+
+    \item[\medium] Draw the tree of all possible changes for $S = 4$ with coins $\{1, 2\}$. Highlight the valid changes (leaves where the remaining sum is 0).
+
+    \item[\medium] Find another coin system (different from $\{1, 3, 4\}$) where the greedy algorithm fails. Give the counter-example and the optimal change.
+
+\end{enumerate}
+
+\subsection{Programming Exercises}
+
+\begin{enumerate}[label=\textbf{5.\arabic*}, start=6]
+
+    \item[\medium] Implement \code{interval_scheduling(tasks)} that returns the maximum number of non-overlapping tasks. Test it on a small example.
+    \begin{lstlisting}
+def interval_scheduling(tasks):
+    # tasks = [(start, end), ...]
+    # your code here
+    pass
+
+# Test
+tasks = [(1, 3), (2, 5), (3, 4), (5, 7), (6, 8)]
+print(interval_scheduling(tasks))  # Expected: 3
+    \end{lstlisting}
+
+\end{enumerate}
+
+% ============================================================
+% 6. DYNAMIC PROGRAMMING
+% ============================================================
+\section{Dynamic Programming}
+
+\subsection{Theoretical Exercises}
+
+\begin{enumerate}[label=\textbf{6.\arabic*}]
+
+    \item[\easy] Fill the DP table for the coin change problem with $S = 10$ and coins $\{1, 3, 4\}$. Give the final answer.
+
+    \item[\medium] Draw the tree of balanced parentheses for $n = 4$. How many leaves (valid strings) are there?
+
+    \item[\medium] Write the memoized and tabulated versions of Fibonacci. Test both on $n = 30$. Compare their space complexity and discuss the practical differences.
+
+    \item[\medium] Write the DP for the generalized coin change problem (arbitrary coin system). Test it on $\{1, 3, 4\}$ with $S = 6$, and compare with the greedy result.
+
+    \item[\medium] Write the DP for the Longest Common Subsequence (LCS). Test it on the strings \code{"ABCBDAB"} and \code{"BDCABA"}.
+    
+\end{enumerate}
+
+% ============================================================
+% 7. GRAPHS
+% ============================================================
+\section{Graphs}
+
+\subsection{Programming Exercises}
+
+\begin{enumerate}[label=\textbf{7.\arabic*}]
+
+    \item[\medium] Implement a graph as an adjacency list. Provide \code{add_edge(u, v)} and \code{print_graph()}. Test it on a graph with 5 vertices.
+    \begin{lstlisting}
+class Graph:
+    def __init__(self):
+        self.adj = {}
+
+    def add_edge(self, u, v):
+        # your code here
+        pass
+
+    def print_graph(self):
+        # your code here
+        pass
+    \end{lstlisting}
+
+    \item[\medium] Implement BFS on a graph represented as an adjacency list. Test it on a small graph and print the order of visits.
+    \begin{lstlisting}
+from collections import deque
+
+def bfs(graph, start):
+    # your code here
+    pass
+    \end{lstlisting}
+
+    \item[\medium] Implement DFS (recursive and iterative) on the same graph. Compare the order of visits with BFS.
+    \begin{lstlisting}
+def dfs_recursive(graph, start):
+    # your code here
+    pass
+
+def dfs_iterative(graph, start):
+    # your code here
+    pass
+    \end{lstlisting}
+
+    \item[\hard] Implement Dijkstra's algorithm for shortest paths in a weighted graph. Test it on a graph with 5 vertices and positive weights.
+    \begin{lstlisting}
+import heapq
+
+def dijkstra(graph, source):
+    # your code here
+    pass
+    \end{lstlisting}
+
+\end{enumerate}
+
+\end{document}
